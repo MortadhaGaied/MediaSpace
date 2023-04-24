@@ -111,6 +111,14 @@ public class AuthenticationServiceIml implements AuthenticationService{
         return repository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
+    public boolean validateToken(String token) {
+        try {
+            jwtService.validateToken(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 
 

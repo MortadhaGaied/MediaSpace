@@ -7,15 +7,22 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
+        <module name="space-service" />
+        <module name="gateway-service" />
+        <module name="registry-service" />
+        <module name="searchSpace-service" />
+        <module name="reservation-service" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="auth-service" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="auth-service" options="-parameters" />
+      <module name="gateway-service" options="-parameters" />
+      <module name="registry-service" options="-parameters" />
+      <module name="reservation-service" options="-parameters" />
+      <module name="searchSpace-service" options="-parameters" />
+      <module name="space-service" options="-parameters" />
     </option>
   </component>
 </project>

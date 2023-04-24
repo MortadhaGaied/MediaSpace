@@ -53,7 +53,16 @@ public class JwtService {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
-
+    public void validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid token");
+        }
+    }
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }

@@ -1,10 +1,7 @@
 package tn.medianet.mediaspace.authservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tn.medianet.mediaspace.authservice.service.*;
 
 import javax.validation.Valid;
@@ -28,6 +25,10 @@ public class AuthenticationController {
             @Valid @RequestBody AuthenticationRequest request
     ) {
         return ResponseEntity.ok(service.authenticate(request));
+    }
+    @GetMapping("/validate")
+    public boolean validate(@RequestParam("token") String token){
+        return service.validateToken(token);
     }
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) {
