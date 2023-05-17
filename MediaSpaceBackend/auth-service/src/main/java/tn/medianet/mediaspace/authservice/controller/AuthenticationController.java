@@ -7,7 +7,7 @@ import tn.medianet.mediaspace.authservice.service.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 

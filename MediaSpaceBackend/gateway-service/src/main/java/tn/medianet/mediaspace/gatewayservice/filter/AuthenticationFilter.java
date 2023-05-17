@@ -6,15 +6,18 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     @Autowired
     private RouteValidator validator;
-
     @Autowired
-    private RestTemplate template;
+    private WebClient.Builder webClientBuilder;
+
+
 
     public AuthenticationFilter() {
         super(Config.class);
@@ -33,13 +36,21 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     authHeader = authHeader.substring(7);
                 }
-                Boolean isValid;
+
 
                 //REST call to AUTH service
-                isValid=template.getForObject("http://AUTH-SERVICE//api//v1//auth//validate?token" + authHeader, Boolean.class);
-                if (!isValid) {
-                    throw new RuntimeException("unauthorized access to application");
-                }
+                Mono<Boolean> isValidMono = webClientBuilder.build()
+                        .get()
+                        .uri("http://AUTH-SERVICE/auth/validate?token=" + authHeader)
+                        .retrieve()
+                        .bodyToMono(Boolean.class);
+                return isValidMono.flatMap(isValid -> {
+                    if (!isValid) {
+                        return Mono.error(new RuntimeException("unauthorized access to application"));
+                    } else {
+                        return chain.filter(exchange);
+                    }
+                });
 
 
             }
