@@ -3,6 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/MediaSpaceBackend.iml" filepath="$PROJECT_DIR$/.idea/MediaSpaceBackend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/auth-service/auth-service.iml" filepath="$PROJECT_DIR$/auth-service/auth-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gateway-service/gateway-service.iml" filepath="$PROJECT_DIR$/gateway-service/gateway-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/registry-service/registry-service.iml" filepath="$PROJECT_DIR$/registry-service/registry-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reservation-service/reservation-service.iml" filepath="$PROJECT_DIR$/reservation-service/reservation-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/searchSpace-service/searchSpace-service.iml" filepath="$PROJECT_DIR$/searchSpace-service/searchSpace-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/space-service/space-service.iml" filepath="$PROJECT_DIR$/space-service/space-service.iml" />
     </modules>
   </component>
 </project>

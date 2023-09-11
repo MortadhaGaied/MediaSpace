@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import tn.medianet.mediaspace.authservice.service.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
@@ -12,7 +13,7 @@ import javax.validation.Valid;
 public class AuthenticationController {
 
     private final AuthenticationService service;
-
+    private final IServiceFile serviceFile;
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
@@ -33,6 +34,14 @@ public class AuthenticationController {
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) {
         return ResponseEntity.ok(service.refresh(request));
+    }
+    @GetMapping("/getUserById/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id){
+        return ResponseEntity.ok(service.getUserById(id));
+    }
+    @GetMapping("/urlProfilePicture/{filename}")
+    public String getUrlFile(@PathVariable String filename) throws IOException {
+        return serviceFile.getDownloadUrl(filename);
     }
 
 

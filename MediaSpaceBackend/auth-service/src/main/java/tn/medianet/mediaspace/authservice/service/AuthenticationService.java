@@ -5,4 +5,5 @@ public interface AuthenticationService {
     AuthenticationResponse authenticate(AuthenticationRequest request);
     AuthenticationResponse refresh(RefreshRequest request);
     boolean validateToken(String token);
+    UserResponse getUserById(Long id);
 }

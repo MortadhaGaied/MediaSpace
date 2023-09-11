@@ -7,8 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-@Entity
-@Data
+//@Entity
+//@Data
 public class Reservation {
 
     @Id
