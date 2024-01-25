@@ -1,5 +1,5 @@
-import 'package:demo/pages/home_page.dart';
-import 'package:demo/pages/profile_pages/update_profile_screen.dart';
+import 'package:MediaSpaceFrontend/pages/home_page.dart';
+import 'package:MediaSpaceFrontend/pages/profile_pages/update_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

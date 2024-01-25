@@ -1,0 +1,11 @@
+
+o	java:S116"URename this field "BUCKETNAME" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(íÚÃ”ıÿÿÿÿ
+u	java:S116"TRename this field "PROJECTID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ğ±”¬ıÿÿÿÿ8æÿéÓ1
+<
+java:S1170"!Make this final field static too.(íÚÃ”ıÿÿÿÿ
+C
+java:S1170"!Make this final field static too.(Ğ±”¬ıÿÿÿÿ8çÿéÓ1
+M
+java:S1854+"8Remove this useless assignment to local variable "blob".(Ş¦šS
+>
+java:S1481+")Remove this unused "blob" local variable.(Ş¦šS

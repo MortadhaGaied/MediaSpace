@@ -143,6 +143,7 @@ public class AuthenticationServiceIml implements AuthenticationService{
         User user = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         return UserResponse.builder()
+                .id(id)
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .profile_picture(user.getProfile_picture())

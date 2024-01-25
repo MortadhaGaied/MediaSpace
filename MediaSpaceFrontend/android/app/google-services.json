@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "245327323352",
+    "project_id": "mediaspace-daa28",
+    "storage_bucket": "mediaspace-daa28.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245327323352:android:c0ad496c43f86a16eef7ad",
+        "android_client_info": {
+          "package_name": "com.example.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMm5PHwrvAZMq0CIz4r8bd_CgaJnYsGd0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,11 @@
+
+`	java:S112="FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ
+N	java:S106N"9Replace this use of System.out or System.err by a logger.(Ø¼¢ƒ
+g
+java:S1128"LRemove this unused import 'org.springframework.web.multipart.MultipartFile'.(ôŸœžÿÿÿÿÿ
+H
+java:S1128"2Remove this unused import 'javax.imageio.ImageIO'.(‘çÔû
+T
+java:S1128"9Remove this unused import 'java.awt.image.BufferedImage'.(×íÐ‡þÿÿÿÿ
+O
+java:S1128":Remove this unused import 'java.io.ByteArrayOutputStream'.(Î‡È

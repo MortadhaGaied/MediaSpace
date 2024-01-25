@@ -1,14 +1,16 @@
-import 'package:demo/widgets/page3step3.dart';
+import 'package:MediaSpaceFrontend/widgets/page3step3.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:multiple_images_picker/multiple_images_picker.dart';
 
 import '../../services/models/Address.dart';
 import '../../services/models/SpaceType.dart';
 import '../../services/models/space.dart';
 import '../../services/models/spaceavailability.dart';
+import '../../widgets/map_position.dart';
 import '../../widgets/page2_step3.dart';
-import '../../widgets/select_space_image.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 void main() {
   runApp(MyApp());
 }
@@ -21,26 +23,18 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class MultiStepForm extends StatefulWidget {
   @override
   _MultiStepFormState createState() => _MultiStepFormState();
 }
-
 class _MultiStepFormState extends State<MultiStepForm> {
-  String? selectedSpaceType;
+
   String? ownerType;
   int currentStep = 0;
   int currentPage = 0;
-  double? spaceArea;
-  List<String> accessibilityOptions = [];
-  List<String> selectedEquipments = [];
   bool isOtherChecked = false;
-  String? otherAccessibilityOption;
-  String? spaceTitle;
-  String? spaceDescription;
-  int? ageRestriction;
-  List<SpaceAvailability> spaceAvailabilityList = [];
+
+  ValueNotifier<LatLng?> pickedPosition = ValueNotifier<LatLng?>(null);
   Space space = Space(
     address: Address(),
     amenities: [],
@@ -53,7 +47,6 @@ class _MultiStepFormState extends State<MultiStepForm> {
     String title = "";
     String subTitle = "";
     String description = "";
-
     switch (step) {
       case 0:
         title = "Etape 1 : Les bases";
@@ -74,7 +67,6 @@ class _MultiStepFormState extends State<MultiStepForm> {
         "Assurez-vous que votre espace est disponible pour les locataires en configurant facilement les heures, les jours et les semaines de disponibilité. Définissez également les prix de location par heure pour maximiser vos revenus. N'oubliez pas de préciser les options de sécurité disponibles, comme le parking et les caméras de surveillance.";
         break;
     }
-
     return Column(
       //mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -105,26 +97,20 @@ class _MultiStepFormState extends State<MultiStepForm> {
         ),
       ],
     );
-
   }
-
-
   Widget getSecondPageContent() {
-
-
-    List<Map<String, String>> spaceTypes = [
-      {'type': 'Maison', 'icon': 'assets/images/facebook.png','spaceType':'HOUSE'},
-      {'type': 'Appartement', 'icon': 'assets/images/facebook.png','spaceType':'APARTMENT'},
-      {'type': 'Bureau', 'icon': 'assets/images/facebook.png','spaceType':'OFFICE'},
-      {'type': 'Studio', 'icon': 'assets/images/facebook.png','spaceType':'STUDIO'},
-      {'type': 'Restaurant', 'icon': 'assets/images/facebook.png','spaceType':'BARRESTO'},
-      {'type': 'Salle des fetes', 'icon': 'assets/images/facebook.png','spaceType':'HOUSE'},
-      {'type': 'Theatre', 'icon': 'assets/images/facebook.png','spaceType':'HOUSE'},
-      {'type': 'Bateau', 'icon': 'assets/images/facebook.png','spaceType':'BOAT'},
-      {'type': 'Hotel', 'icon': 'assets/images/facebook.png','spaceType':'HOTEL'},
-      {'type': 'Galerie', 'icon': 'assets/images/facebook.png','spaceType':'GALLERY'},
+    List<Map<String, dynamic>> spaceTypes = [
+      {'type': 'Maison', 'icon': Icons.home,'spaceType':'HOUSE'},
+      {'type': 'Appartement', 'icon': Icons.apartment,'spaceType':'APARTMENT'},
+      {'type': 'Bureau', 'icon':Icons.maps_home_work ,'spaceType':'OFFICE'},
+      {'type': 'Studio', 'icon':Icons.headset ,'spaceType':'STUDIO'},
+      {'type': 'Restaurant', 'icon':Icons.tapas ,'spaceType':'BARRESTO'},
+      {'type': 'Salle des fetes', 'icon': Icons.castle,'spaceType':'HOUSE'},
+      {'type': 'Theatre', 'icon': Icons.theaters,'spaceType':'HOUSE'},
+      {'type': 'Bateau', 'icon': Icons.directions_boat,'spaceType':'BOAT'},
+      {'type': 'Hotel', 'icon': Icons.hotel,'spaceType':'HOTEL'},
+      {'type': 'Galerie', 'icon': Icons.color_lens,'spaceType':'GALLERY'},
     ];
-
     return Column(
       children: [
         Text(
@@ -140,20 +126,21 @@ class _MultiStepFormState extends State<MultiStepForm> {
             ),
             itemCount: spaceTypes.length,
             itemBuilder: (context, index) {
+              SpaceType currentSpaceType = SpaceType.values.firstWhere(
+                      (e) => e.toString() == 'SpaceType.' + spaceTypes[index]['spaceType']!,
+                  orElse: () => SpaceType.HOUSE
+              );
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    space.spaceType = SpaceType.values.firstWhere((e) => e.toString() == 'Fruit.' + spaceTypes[index]['spaceType']!);
+                    space.spaceType = currentSpaceType;
                   });
-                  print(selectedSpaceType);
+                  print(space.spaceType.toString());
                 },
                 child: Container(
                   margin: EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-
-                    color: selectedSpaceType == spaceTypes[index]['type']
-                        ? Colors.blue
-                        : Colors.white,
+                    color: space.spaceType == currentSpaceType ? Colors.blue : Colors.white,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
@@ -167,17 +154,17 @@ class _MultiStepFormState extends State<MultiStepForm> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        spaceTypes[index]['icon']!,
-                        height: 50,
-                        width: 50,
+                      Icon(
+                        spaceTypes[index]['icon'],
+                        size: 70,
+                        color: space.spaceType == currentSpaceType ? Colors.white : Colors.black,
                       ),
+                      SizedBox(height: 10),
                       Text(
                         spaceTypes[index]['type']!,
                         style: TextStyle(
-                          color: selectedSpaceType == spaceTypes[index]['type']
-                              ? Colors.white
-                              : Colors.black,
+                          fontSize: 20,
+                          color: space.spaceType == currentSpaceType ? Colors.white : Colors.black,
                         ),
                       ),
                     ],
@@ -191,12 +178,11 @@ class _MultiStepFormState extends State<MultiStepForm> {
     );
   }
   Widget getThirdPageContent() {
-    List<Map<String, String>> ownerTypes = [
-      {'type': 'Individual', 'icon': 'assets/images/facebook.png'},
-      {'type': 'Company', 'icon': 'assets/images/facebook.png'},
-      {'type': 'Organization', 'icon': 'assets/images/facebook.png'},
+    List<Map<String, dynamic>> ownerTypes = [
+      {'type': 'Individual', 'icon': Icons.person},
+      {'type': 'Company', 'icon': Icons.business},
+      {'type': 'Organization', 'icon': Icons.group},
     ];
-
     return Column(
       children: [
         Text(
@@ -235,15 +221,19 @@ class _MultiStepFormState extends State<MultiStepForm> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        ownerTypes[index]['icon']!,
-                        height: 50,
-                        width: 50,
+                      SizedBox(width: 10,),
+                      Icon(
+                        ownerTypes[index]['icon'],
+                        size: 70,
+                        color: ownerType == ownerTypes[index]['type']
+                            ? Colors.white
+                            : Colors.black,
                       ),
-                      SizedBox(width: 10),
+                      SizedBox(width: 30),
                       Text(
                         ownerTypes[index]['type']!,
                         style: TextStyle(
+                          fontSize: 25,
                           color: ownerType == ownerTypes[index]['type']
                               ? Colors.white
                               : Colors.black,
@@ -260,62 +250,148 @@ class _MultiStepFormState extends State<MultiStepForm> {
     );
   }
   Widget getFourthPageContent() {
-    TextEditingController countryController = TextEditingController();
-    TextEditingController addressController = TextEditingController();
+    TextEditingController address1Controller = TextEditingController();
+    TextEditingController address2Controller = TextEditingController();
     TextEditingController stateController = TextEditingController();
     TextEditingController cityController = TextEditingController();
     TextEditingController postalCodeController = TextEditingController();
+    String? _selectedRegion;
+    Map<String, LatLng> tunisiaRegions = {
+      'Ariana': LatLng(36.8665, 10.1647),
+      'Beja': LatLng(36.7256, 9.18169),
+      'Ben Arous': LatLng(36.7473, 10.2219),
+      'Bizerte': LatLng(37.2744, 9.8745),
+      'Gabes': LatLng(33.8815, 10.0982),
+      'Gafsa': LatLng(34.4227, 8.7842),
+      'Jendouba': LatLng(36.5034, 8.7753),
+      'Kairouan': LatLng(35.6781, 10.0963),
+      'Kasserine': LatLng(35.1676, 8.8365),
+      'Kebili': LatLng(33.7044, 8.9690),
+      'Kef': LatLng(36.1693, 8.7049),
+      'Mahdia': LatLng(35.5049, 11.0628),
+      'Manouba': LatLng(36.8083, 10.0972),
+      'Medenine': LatLng(33.3549, 10.5054),
+      'Monsatir': LatLng(35.7836, 10.8259), // Note: It might be "Monastir", so check the name
+      'Nabeul': LatLng(36.4561, 10.7376),
+      'Sfax': LatLng(34.7452, 10.7613),
+      'Sidi Bouzid': LatLng(35.0382, 9.4849),
+      'Siliana': LatLng(36.0845, 9.3708),
+      'Sousse': LatLng(35.8254, 10.6084),
+      'Tataouine': LatLng(32.9297, 10.4510),
+      'Tozeur': LatLng(33.9197, 8.1339),
+      'Tunis': LatLng(36.8065, 10.1815),
+      'Zaghouan': LatLng(36.4043, 10.1421),
+    };
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Où est situé votre place?",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0), // Add space around the edge
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Où est situé votre place?",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-          TextFormField(
-            controller: countryController,
-            decoration: InputDecoration(
-              labelText: 'Pays',
-              border: OutlineInputBorder(),
+            // Address Fields
+            Text("Adresse"),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: address1Controller,
+              decoration: InputDecoration(
+                labelText: 'Adresse 1',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                if (space.address == null) {
+                  space.address = Address();
+                }
+                space.address!.street = value;
+              },
             ),
-          ),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: addressController,
-            decoration: InputDecoration(
-              labelText: 'Adresse',
-              border: OutlineInputBorder(),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: address2Controller,
+              decoration: InputDecoration(
+                labelText: 'Adresse 2',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                if (space.address == null) {
+                  space.address = Address();
+                }
+                space.address!.street = (space.address!.street ?? '') + ', ' + (value ?? '');
+              },
             ),
-          ),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: stateController,
-            decoration: InputDecoration(
-              labelText: 'Etat/Region',
-              border: OutlineInputBorder(),
+            SizedBox(height: 10),
+
+            // Region Dropdown for Tunisia
+            DropdownButtonFormField<String>(
+              value: _selectedRegion,
+              items: tunisiaRegions.keys.map((region) {
+                return DropdownMenuItem<String>(
+                  value: region,
+                  child: Text(region),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedRegion = newValue;
+                  if (_selectedRegion != null && tunisiaRegions.containsKey(_selectedRegion!)) {
+                    pickedPosition.value = tunisiaRegions[_selectedRegion!];
+                  }
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Etat/Region',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: cityController,
-            decoration: InputDecoration(
-              labelText: 'Ville',
-              border: OutlineInputBorder(),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: cityController,
+              decoration: InputDecoration(
+                labelText: 'Ville',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                if (space.address == null) {
+                  space.address = Address();
+                }
+                space.address!.city = value;
+              },
             ),
-          ),
-          SizedBox(height: 10),
-          TextFormField(
-            controller: postalCodeController,
-            decoration: InputDecoration(
-              labelText: 'Code postal',
-              border: OutlineInputBorder(),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: postalCodeController,
+              decoration: InputDecoration(
+                labelText: 'Code postal',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                if (space.address == null) {
+                  space.address = Address();
+                }
+                space.address!.zipCode = value;
+              },
             ),
-          ),
-        ],
+            SizedBox(height: 10),
+            CustomMap2(
+              pickedPosition: pickedPosition,
+              onConfirm: (position) {
+                // Store the position or handle it
+                if (space.address == null) {
+                  space.address = Address();
+                }
+                space.address!.latitude = position.latitude;
+                space.address!.longitude = position.longitude;
+
+                print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -333,7 +409,6 @@ class _MultiStepFormState extends State<MultiStepForm> {
             setState(() {
               space.roomNumber = (space.roomNumber ?? 0) + 1;
             });
-
           }, () {
             setState(() {
               if (space.roomNumber! > 0) space.roomNumber = (space.roomNumber ?? 0) - 1;
@@ -362,7 +437,7 @@ class _MultiStepFormState extends State<MultiStepForm> {
           TextFormField(
             keyboardType: TextInputType.number,
             onChanged: (value) {
-              spaceArea = double.tryParse(value);
+              space.squareFootage = double.tryParse(value);
             },
             decoration: InputDecoration(
               suffixText: 'm²',
@@ -388,7 +463,7 @@ class _MultiStepFormState extends State<MultiStepForm> {
                 hintText: 'Autre',
               ),
               onChanged: (value) {
-                otherAccessibilityOption = value;
+                space.accessibility?.add(value);
               },
             ),
         ],
@@ -464,33 +539,27 @@ class _MultiStepFormState extends State<MultiStepForm> {
       ],
     );
   }
-
-
-
   Widget getSecondPageStep2Content() {
-    List<Map<String, String>> generalEquipments = [
-      {'name': 'Wifi', 'icon': 'assets/images/facebook.png'},
-      {'name': 'TV', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Cuisine', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Climatisation', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Insonore', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Tableau', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Table', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Eclairage photographie', 'icon': 'assets/images/facebook.png'},
+    List<Map<String, dynamic>> generalEquipments = [
+      {'name': 'Wifi', 'icon': Icons.wifi},
+      {'name': 'TV', 'icon': Icons.tv},
+      {'name': 'Cuisine', 'icon': Icons.restaurant},
+      {'name': 'Climatisation', 'icon': Icons.ac_unit},
+      {'name': 'Insonore', 'icon': Icons.volume_off},
+      {'name': 'Tableau', 'icon': Icons.border_color},
+      {'name': 'Table', 'icon': Icons.table_chart},
+      {'name': 'Eclairage photographie', 'icon': Icons.lightbulb_outline},
     ];
-
-    List<Map<String, String>> exceptionalEquipments = [
-      {'name': 'Piscine', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Equipement de sport', 'icon': 'assets/images/facebook.png'},
+    List<Map<String, dynamic>> exceptionalEquipments = [
+      {'name': 'Piscine', 'icon': Icons.pool},
+      {'name': 'Equipement de sport', 'icon': Icons.sports},
     ];
-
-    List<Map<String, String>> securityItems = [
-      {'name': 'Extincteur', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Trousse de premiers soins', 'icon': 'assets/images/facebook.png'},
-      {'name': 'Decteur de fumée', 'icon': 'assets/images/facebook.png'},
+    List<Map<String, dynamic>> securityItems = [
+      {'name': 'Extincteur', 'icon': Icons.fire_extinguisher},
+      {'name': 'Trousse de premiers soins', 'icon': Icons.medical_services},
+      {'name': 'Decteur de fumée', 'icon': Icons.smoke_free},
     ];
-
-    Widget buildSelectionBoxes(List<Map<String, String>> items) {
+    Widget buildSelectionBoxes(List<Map<String, dynamic>> items) {
       return GridView.builder(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -533,18 +602,23 @@ class _MultiStepFormState extends State<MultiStepForm> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    items[index]['icon']!,
-                    height: 50,
-                    width: 50,
+                  Icon(
+                    items[index]['icon'],
+                    size: 50,
+                    color: (space.amenities?.contains(items[index]['name']) ?? false)
+                        ? Colors.white
+                        : Colors.black,
                   ),
+                  SizedBox(height: 10),
                   Text(
                     items[index]['name']!,
                     style: TextStyle(
+                      fontSize: 20, // Adjust this value as needed
                       color: (space.amenities?.contains(items[index]['name']) ?? false)
                           ? Colors.white
                           : Colors.black,
                     ),
+                    textAlign: TextAlign.center, // This centers the text
                   ),
                 ],
               ),
@@ -553,7 +627,6 @@ class _MultiStepFormState extends State<MultiStepForm> {
         },
       );
     }
-
     return SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
       child: Column(
@@ -577,59 +650,100 @@ class _MultiStepFormState extends State<MultiStepForm> {
           buildSelectionBoxes(securityItems),
         ],
       )
-
-
     );
   }
   List<Asset> images = <Asset>[];
-
+  String _error = 'No Error Detected';
   Future<void> loadAssets() async {
-    List<Asset> resultList = <Asset>[];
-    try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 10,
-      );
-    } catch (e) {
-      print(e);
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      images = resultList;
-    });
-  }
-  Widget getThirdPageStep2Content(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Vous aurez besoin de 4 photos pour commencer. Vous pouvez en ajouter d'autres ou apporter des modifications ultérieurement.",
-          style: TextStyle(fontSize: 16),
-        ),
-        SizedBox(height: 20),
-        GestureDetector(
-          onTap: () {
-            loadAssets();
-          },
-          child: Container(
-            height: 200,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-            ),
-            child: images.isEmpty
-                ? Center(
-              child: Text(
-                "Choisissez au moins 4 photos",
-                style: TextStyle(color: Colors.grey),
-              ),
-            )
-                : buildGridView(),
+    if (await _requestPermission(Permission.photos)) {
+      List<Asset> resultList = <Asset>[];
+      String error = 'No Error Detected';
+      try {
+        resultList = await MultipleImagesPicker.pickImages(
+          maxImages: 10,
+          enableCamera: true,
+          selectedAssets: images,
+          cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+          materialOptions: MaterialOptions(
+            actionBarColor: "#abcdef",
+            actionBarTitle: "Select Images",
+            allViewTitle: "All Photos",
+            useDetailsView: false,
+            selectCircleStrokeColor: "#000000",
           ),
-        ),
-      ],
-    );
+        );
+      } on Exception catch (e) {
+        error = e.toString();
+        print(error);
+      }
+      if (!mounted) return;
 
+      setState(() {
+        images = resultList;
+        _error = error;
+      });
+    } else {
+      setState(() {
+        _error = 'Permission not granted to access photos';
+      });
+    }
+  }
+  Future<bool> _requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+  Widget getThirdPageStep2Content() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Vous aurez besoin de 4 photos pour commencer. Vous pouvez en ajouter d'autres ou apporter des modifications ultérieurement.",
+            style: TextStyle(fontSize: 18),
+          ),
+          SizedBox(height: 50),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: GestureDetector(
+              onTap: () {
+                loadAssets();
+              },
+              child: DottedBorder(
+                dashPattern: [8, 4],
+                strokeWidth: 2,
+                color: Colors.grey,
+                borderType: BorderType.RRect,
+                radius: Radius.circular(10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  child: Container(
+                    height: 300,
+                    child: images.isEmpty
+                        ? Center(
+                      child: Text(
+                        "Choisissez au moins 4 photos",
+                        style: TextStyle(color: Colors.grey, fontSize: 18),
+                      ),
+                    )
+                        : buildGridView(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_error.isNotEmpty) Center(child: Text('Error: $_error')),
+        ],
+      ),
+    );
   }
   Widget buildGridView() {
     return GridView.count(
@@ -647,7 +761,17 @@ class _MultiStepFormState extends State<MultiStepForm> {
   Widget getFourthPageStep2Content() {
     TextEditingController titleController = TextEditingController();
     TextEditingController descriptionController = TextEditingController();
-    TextEditingController ageRestrictionController = TextEditingController();
+    List<String> ageRestrictions = [
+      "Tout les ages",
+      "18+",
+      "21+",
+    ];
+
+    // If you haven't initialized these properties of the 'space' object, ensure you do so.
+    String selectedAgeRestriction = space.restrictedMinAge != null ?
+    (space.restrictedMinAge == 18 ? "18+" :
+    (space.restrictedMinAge == 21 ? "21+" : "Tout les ages")) :
+    "Tout les ages";
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -655,41 +779,65 @@ class _MultiStepFormState extends State<MultiStepForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Additional Details",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            "Donnez un titre à votre espace",
+            style: TextStyle(fontSize: 18),
           ),
           SizedBox(height: 20),
           TextFormField(
-            controller: titleController,
+            controller: titleController..text = space.name ?? '',  // Initialize with space's name if available.
             decoration: InputDecoration(
-              labelText: 'Title',
+              labelText: 'Titre',
+              hintText: "Titre",
               border: OutlineInputBorder(),
             ),
             onChanged: (value) {
-              spaceTitle = value;
+              space.name = value;
             },
+          ),
+          SizedBox(height: 20),
+          Text(
+            "Ajouter une description pour votre espace",
+            style: TextStyle(fontSize: 18),
           ),
           SizedBox(height: 10),
           TextFormField(
-            controller: descriptionController,
+            controller: descriptionController..text = space.description ?? '',  // Initialize with space's description if available.
+            maxLines: 5,
             decoration: InputDecoration(
-              labelText: 'Description',
               border: OutlineInputBorder(),
+              hintText: "",
             ),
             onChanged: (value) {
-              spaceDescription = value;
+              space.description = value;
             },
           ),
+          SizedBox(height: 20),
+          Text(
+            "Qui est autorisé dans votre espace?",
+            style: TextStyle(fontSize: 18),
+          ),
           SizedBox(height: 10),
-          TextFormField(
-            controller: ageRestrictionController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: 'Age Restriction',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value) {
-              ageRestriction = int.tryParse(value);
+          DropdownButtonFormField<String>(
+            value: selectedAgeRestriction,
+            items: ageRestrictions.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              setState(() {
+                selectedAgeRestriction = newValue!;
+
+                // Convert the selected string to the appropriate age restriction.
+                if (newValue == "18+") {
+                  space.restrictedMinAge = 18;
+                } else if (newValue == "21+") {
+                  space.restrictedMinAge = 21;
+                } else {
+                  space.restrictedMinAge = null; // This represents "Tout les ages".
+                }
+              });
             },
           ),
         ],
@@ -697,68 +845,7 @@ class _MultiStepFormState extends State<MultiStepForm> {
     );
   }
 
-  Widget getPageTwoStep3Content() {
-    Map<String, bool> daysOpen = {
-      'Monday': false,
-      'Tuesday': false,
-      'Wednesday': false,
-      'Thursday': false,
-      'Friday': false,
-      'Saturday': false,
-      'Sunday': false,
-    };
 
-    Map<String, TimeOfDay> openingTime = {};
-    Map<String, TimeOfDay> closingTime = {};
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0), // Add space on the edges
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Quelles sont vos heures d’ouverture?",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            "Les heures d’ouverture sont les jours et les heures de la semaine où votre logement est ouvert aux réservations d’hôtes (c’est-à-dire votre disponibilité générale). Les clients ne pourront pas réserver d’heures en dehors de vos heures d’ouverture",
-            style: TextStyle(fontSize: 14),
-          ),
-          SizedBox(height: 20),
-          ...daysOpen.keys.map((day) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(day),
-                SizedBox(width: 10), // Add a little space between the day and the toggle button
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      daysOpen[day] = !daysOpen[day]!;
-                    });
-                  },
-                  child: Text(daysOpen[day]! ? "Ouvert" : "Fermer"),
-                  style: ElevatedButton.styleFrom(
-                    primary: daysOpen[day]! ? Colors.black : Colors.grey, // Change color when it's on
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ],
-      ),
-    );
-
-  }
-  void displayList(){
-    print(spaceAvailabilityList);
-    for (SpaceAvailability availability in spaceAvailabilityList) {
-      print('Day of Week: ${availability.dayOfWeek}');
-      print('Start Time: ${availability.startTime.hour}:${availability.startTime.minute}');
-      print('End Time: ${availability.endTime.hour}:${availability.endTime.minute}');
-      print('---');
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -800,26 +887,22 @@ class _MultiStepFormState extends State<MultiStepForm> {
                 : (currentStep == 1 && currentPage == 3)
                 ? getFourthPageStep2Content()
                 : (currentStep == 2 && currentPage == 1)
-                ? PageTwoStep3(spaceAvailabilityList: spaceAvailabilityList)
+                ? PageTwoStep3(spaceAvailabilityList: space.availabilities)
                 : (currentStep == 2 && currentPage == 2)
-                ? PageThreeStep3()
+                ? PageThreeStep3(eventPrices:space.eventPrices)
 
                 : Center(
               child: Text('Page ${currentPage + 1} of Step ${currentStep + 1}'),
             ),
           ),
-
-          // Progress Bar
           LinearProgressIndicator(
             value: (currentPage + 1) / (currentStep == 1 ? 4 : 5),
           ),
-          // Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
                 onPressed: () {
-                  displayList();
                   setState(() {
                     if (currentPage > 0) {
                       currentPage--;
@@ -833,7 +916,6 @@ class _MultiStepFormState extends State<MultiStepForm> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  displayList();
                   setState(() {
                     if (currentPage < (currentStep == 1 ? 3 : 4)) {
                       currentPage++;

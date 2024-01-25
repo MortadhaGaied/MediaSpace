@@ -1,6 +1,6 @@
-import 'package:demo/widgets/customp_appbar.dart';
-import 'package:demo/widgets/custom_bottomNavigationBar.dart';
-import 'package:demo/widgets/top_spaces.dart';
+import 'package:MediaSpaceFrontend/widgets/customp_appbar.dart';
+import 'package:MediaSpaceFrontend/widgets/custom_bottomNavigationBar.dart';
+import 'package:MediaSpaceFrontend/widgets/top_spaces.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -33,8 +33,7 @@ class _SearchPageState extends State<SearchPage> {
       print('Retrieved all spaces successfully');
       setState(() {
         spaceList = json.decode(response.body);
-        print('******************************************');
-        print(spaceList);
+        print(spaceList[3]);
       });
     } else {
       print('Failed to retrieve spaces: ${response.statusCode}');
@@ -89,15 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                 ),
-                SizedBox(width: 10.0),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Enter the event type',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
+
                 IconButton(
                   onPressed: () {
                     Navigator.push(

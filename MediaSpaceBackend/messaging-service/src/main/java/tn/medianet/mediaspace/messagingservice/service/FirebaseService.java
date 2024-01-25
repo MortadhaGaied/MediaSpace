@@ -2,10 +2,14 @@ package tn.medianet.mediaspace.messagingservice.service;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.medianet.mediaspace.messagingservice.entity.Chat;
 import tn.medianet.mediaspace.messagingservice.entity.Message;
+import tn.medianet.mediaspace.messagingservice.entity.NotificationMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +19,31 @@ import java.util.concurrent.ExecutionException;
 public class FirebaseService {
 
     private final Firestore firestore;
-
+    private final FirebaseMessaging firebaseMessaging;
     @Autowired
-    public FirebaseService(Firestore firestore) {
+    public FirebaseService(Firestore firestore,FirebaseMessaging firebaseMessaging) {
         this.firestore = firestore;
+        this.firebaseMessaging=firebaseMessaging;
     }
-
+    public String sendNotificationByToken(NotificationMessage notificationMessage){
+        Notification notification=Notification.builder()
+                .setTitle(notificationMessage.getTitle())
+                .setBody(notificationMessage.getBody())
+                .setImage(notificationMessage.getImage())
+                .build();
+        com.google.firebase.messaging.Message message=com.google.firebase.messaging.Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(notification)
+                .putAllData(notificationMessage.getData())
+                .build();
+        try{
+            firebaseMessaging.send(message);
+            return "Success Sending Notification";
+        }catch (FirebaseMessagingException e){
+            e.printStackTrace();
+            return "Error Sending Notification";
+        }
+    }
     public void saveMessage(Message message) {
         ApiFuture<WriteResult> future = firestore.collection("messages").document(message.getId().toString()).set(message);
         try {

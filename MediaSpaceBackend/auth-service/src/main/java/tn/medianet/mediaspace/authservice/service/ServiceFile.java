@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 public class ServiceFile implements IServiceFile {
     @Value("${app.firebase-configuration-file}")
     private String firebaseConfigPath;
-    private final String BUCKETNAME = "mediaspace-40056.appspot.com";
+    private final String BUCKETNAME = "mediaspace-daa28.appspot.com";
 
-    private final String PROJECTID = "mediaspace-40056";
+    private final String PROJECTID = "mediaspace-daa28";
     private StorageOptions getStorageOptions() throws IOException {
         StorageOptions storageOptions;
 
@@ -37,13 +37,12 @@ public class ServiceFile implements IServiceFile {
     }
 
     public String uploadFile(byte[] bytes, String fileName, String contentType) throws IOException {
+        // Add additional content types for video
+        boolean isImage = contentType.equals("image/jpeg") || contentType.equals("image/png");
+        boolean isVideo = contentType.equals("video/mp4") || contentType.equals("video/avi");
 
-
-        for(byte b:bytes){
-            System.out.println(b);
-        }
-        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
-            return ("File uploaded must be of type image only");
+        if (!isImage && !isVideo) {
+            return ("File uploaded must be of type image or video only");
         }
 
         Storage storage = getStorageOptions().getService();
@@ -55,17 +54,6 @@ public class ServiceFile implements IServiceFile {
         return fileName;
     }
 
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convertedFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-        FileOutputStream fos = new FileOutputStream(convertedFile);
-        fos.write(file.getBytes());
-        fos.close();
-        return convertedFile;
-    }
-
-    private String generateFileName(MultipartFile multiPart) {
-        return new Date().getTime() + "-" + Objects.requireNonNull(multiPart.getOriginalFilename()).replace(" ", "_");
-    }
     public String getDownloadUrl(String fileName) throws IOException {
         Storage storage = getStorageOptions().getService();
 

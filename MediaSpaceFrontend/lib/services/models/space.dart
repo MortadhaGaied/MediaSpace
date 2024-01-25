@@ -1,13 +1,17 @@
+
+
+import 'package:MediaSpaceFrontend/services/models/space_event_price.dart';
+
 import 'Address.dart';
 import 'SpaceEquipement.dart';
 import 'SpaceType.dart';
+import 'spaceavailability.dart';
 
 class Space {
   int? id;
   String? name;
   Address? address;
   String? description;
-  double? price;
   int? maxGuest;
   int? roomNumber;
   int? bathroomNumber;
@@ -21,8 +25,9 @@ class Space {
   List<String>? accessibility;
   List<String>? images;
   double? squareFootage;
-  List<String>? availabilities; // Assuming you'll create a SpaceAvailability Dart class
+  List<SpaceAvailability>? availabilities;
   int? ownerId;
+  List<SpaceEventPrice>? eventPrices;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -31,7 +36,6 @@ class Space {
     this.name,
     this.address,
     this.description,
-    this.price,
     this.maxGuest,
     this.roomNumber,
     this.bathroomNumber,
@@ -47,6 +51,7 @@ class Space {
     this.squareFootage,
     this.availabilities,
     this.ownerId,
+    this.eventPrices,
     this.createdAt,
     this.updatedAt,
   });

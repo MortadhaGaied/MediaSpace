@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../models/chat.dart';
 import '../models/message.dart';
 
 class MessagingService {
-  final String baseUrl = 'http://192.168.1.15:8083/messaging';
+  final String baseUrl = 'http://192.168.192.1:8083';
 
   Future<Message> sendMessage(Message message) async {
     final response = await http.post(
@@ -63,4 +64,52 @@ class MessagingService {
       throw Exception('Failed to load unread messages');
     }
   }
+  Future<List<Chat>> getAllChats(int participantId) async {
+    final response = await http.get(Uri.parse('$baseUrl/api/chat/allChats/$participantId'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = json.decode(response.body);
+      return body.map((dynamic item) => Chat.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load chats');
+    }
+  }
+  Future<Map<String, dynamic>?> getLastMessage(int chatId) async {
+    final response = await http.get(Uri.parse('$baseUrl/api/chat/last/$chatId'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 404) {
+      return null; // Message not found
+    } else {
+      throw Exception('Failed to load last message');
+    }
+  }
+  Future<List<Map<String, dynamic>>> getAllMessagesByChatId(int chatId) async {
+    final response = await http.get(Uri.parse('$baseUrl/api/chat/chat/$chatId'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = json.decode(response.body);
+      return body.map((dynamic item) => item as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Failed to load messages');
+    }
+  }
+  Future<Message> sendAndSaveMessage(Message message) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/chat/message/send'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(message.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return Message.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to send and save message');
+    }
+  }
+
+
 }

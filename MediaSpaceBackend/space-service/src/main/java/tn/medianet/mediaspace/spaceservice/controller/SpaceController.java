@@ -17,6 +17,7 @@ import tn.medianet.mediaspace.spaceservice.entity.mapper.SpaceEquipementMapper;
 import tn.medianet.mediaspace.spaceservice.entity.mapper.SpaceMapper;
 import tn.medianet.mediaspace.spaceservice.service.SpaceService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public class SpaceController {
 
     @Autowired
     public SpaceController(SpaceService spaceService) {
+
         this.spaceService = spaceService;
     }
 

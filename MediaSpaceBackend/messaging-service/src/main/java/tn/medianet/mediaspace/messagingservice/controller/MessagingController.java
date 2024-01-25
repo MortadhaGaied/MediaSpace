@@ -8,6 +8,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import tn.medianet.mediaspace.messagingservice.entity.Chat;
 import tn.medianet.mediaspace.messagingservice.entity.Message;
+import tn.medianet.mediaspace.messagingservice.entity.NotificationMessage;
 import tn.medianet.mediaspace.messagingservice.service.FirebaseService;
 
 import java.util.List;
@@ -28,6 +29,10 @@ public class MessagingController {
     public Message sendMessage(Message message) {
         firebaseService.saveMessage(message);
         return message;
+    }
+    @PostMapping("/testSendMessage")
+    public Message testSendMessage(@RequestBody Message message) {
+        return sendMessage(message);
     }
 
     @GetMapping("/{chatId}")
@@ -54,6 +59,10 @@ public class MessagingController {
     @GetMapping("/chats/{participantId}")
     public List<Chat> getChatsForParticipant(@PathVariable Long participantId) {
         return firebaseService.getChatsForParticipant(participantId);
+    }
+    @PostMapping
+    public String sendNotificationByToken(@RequestBody NotificationMessage notificationMessage){
+        return firebaseService.sendNotificationByToken(notificationMessage);
     }
 
 }

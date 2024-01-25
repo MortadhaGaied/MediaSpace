@@ -11,6 +11,7 @@
         <module name="space-service" />
         <module name="gateway-service" />
         <module name="registry-service" />
+        <module name="mediaInteraction-service" />
         <module name="reservation-service" />
         <module name="searchSpace-service" />
       </profile>
@@ -20,6 +21,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="auth-service" options="-parameters" />
       <module name="gateway-service" options="-parameters" />
+      <module name="mediaInteraction-service" options="-parameters" />
       <module name="messaging-service" options="-parameters" />
       <module name="registry-service" options="-parameters" />
       <module name="reservation-service" options="-parameters" />

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../pages/search-pages/space-details-page.dart';
-
+import 'dart:math' as math;
 class SpaceCard extends StatelessWidget {
   final Map space;
 
@@ -9,6 +9,10 @@ class SpaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var eventPrices = space['eventPrices'] as List<dynamic>;
+    var minPrice = eventPrices.map((e) => e['price'] as double).reduce(math.min);
+    print("**********************\n");
+    print(minPrice);
     return GestureDetector(
       onTap: (){
         Navigator.push(
@@ -64,7 +68,7 @@ class SpaceCard extends StatelessWidget {
                   children: [
                     Text(space['name'], style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("${space['address']['street']}, ${space['address']['city']}, ${space['address']['state']}"),
-                    Text("\$${space['price'].toString()}"),
+                    Text("Prix: \$${minPrice.toStringAsFixed(2)}/hr"),
                     Text("Max guests: ${space['maxGuest'].toString()}"),
                   ],
                 ),

@@ -4,6 +4,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import '../../services/backend/auth-service.dart';
 import '../../widgets/profile_menu.dart';
 import '../intro_screens/onboarding_screen.dart';
+import '../reservation/mesreservations_screen.dart';
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
@@ -55,6 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               } else if (snapshot.hasError) {
                                 return Text('Image loading error: ${snapshot.error}');
                               } else {
+                                print(snapshot.data!);
                                 return Image.network(snapshot.data!);
                               }
                             },
@@ -101,6 +103,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ProfileMenuWidget(title: "Votre espace", icon: LineAwesomeIcons.home, onPress: () {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => OnboardingScreen(),
+                      ));
+                    },),
+                    ProfileMenuWidget(title: "Mes reservation", icon: LineAwesomeIcons.calendar, onPress: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ReservationPage(),
                       ));
                     },),
                     const Divider(),

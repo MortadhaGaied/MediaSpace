@@ -1,0 +1,7 @@
+
+X
+java:S1874"BRemove this use of "EnableGlobalMethodSecurity"; it is deprecated.(ö­ê×
+r
+java:S1128"\Remove this unused import 'org.springframework.security.core.context.SecurityContextHolder'.(ŒÄæë
+w
+java:S1128"aRemove this unused import 'org.springframework.security.web.authentication.logout.LogoutHandler'.(¶„Ý€

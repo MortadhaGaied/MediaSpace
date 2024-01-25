@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tn.medianet.mediaspace.spaceservice.entity.Address;
 import tn.medianet.mediaspace.spaceservice.entity.SpaceAvailability;
+import tn.medianet.mediaspace.spaceservice.entity.SpaceEventPrice;
 import tn.medianet.mediaspace.spaceservice.entity.SpaceType;
 
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ public class SpaceDTO {
     private String name;
     private Address address;
     private String description;
-    private double price;
+    private List<SpaceEventPrice> eventPrices;
     private int maxGuest;
     private int roomNumber;
     private int bathroomNumber;

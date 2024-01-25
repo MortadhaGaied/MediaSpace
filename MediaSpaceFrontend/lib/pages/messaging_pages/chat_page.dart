@@ -1,10 +1,16 @@
 
-import 'package:demo/services/models/chat.dart';
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:MediaSpaceFrontend/services/backend/messaging-service.dart';
+import 'package:MediaSpaceFrontend/services/models/chat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import '../../services/backend/auth-service.dart';
 import '../../services/models/chatuser.dart';
-import '../../services/models/message.dart';
 import '../../widgets/custom_bottomNavigationBar.dart';
 import 'components/chatlist.dart';
 
@@ -14,16 +20,116 @@ class ChatPage extends StatefulWidget{
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<ChatUsers> chatUsers = [
-    ChatUsers(text: "Jane Russel", secondaryText: "Awesome Setup", image: "images/userImage1.jpeg", time: "Now"),
-    ChatUsers(text: "Glady's Murphy", secondaryText: "That's Great", image: "images/userImage2.jpeg", time: "Yesterday"),
-    ChatUsers(text: "Jorge Henry", secondaryText: "Hey where are you?", image: "images/userImage3.jpeg", time: "31 Mar"),
-    ChatUsers(text: "Philip Fox", secondaryText: "Busy! Call me in 20 mins", image: "images/userImage4.jpeg", time: "28 Mar"),
-    ChatUsers(text: "Debra Hawkins", secondaryText: "Thankyou, It's awesome", image: "images/userImage5.jpeg", time: "23 Mar"),
-    ChatUsers(text: "Jacob Pena", secondaryText: "will update you in evening", image: "images/userImage6.jpeg", time: "17 Mar"),
-    ChatUsers(text: "Andrey Jones", secondaryText: "Can you please share the file?", image: "images/userImage7.jpeg", time: "24 Feb"),
-    ChatUsers(text: "John Wick", secondaryText: "How are you?", image: "images/userImage8.jpeg", time: "18 Feb"),
-  ];
+  List<ChatUsers> chatUsers = [];
+  final AuthenticationService authService = AuthenticationService();
+  final MessagingService messagingService=MessagingService();
+  int? currentChatId;
+  String? secondaryText;
+  // Inside _ChatPageState class
+  WebSocketChannel? channel;
+  StreamSubscription? _webSocketSubscription;
+
+
+  @override
+  void initState() {
+    super.initState();
+    channel = IOWebSocketChannel.connect('ws://172.28.160.1:8083/ws');
+    _webSocketSubscription = channel!.stream.listen(
+          (message) {
+        final Map<String, dynamic> messageData = jsonDecode(message);
+        // Check if the message belongs to the current chat
+        // Inside your WebSocket listener
+        if (messageData['chatId'] == currentChatId) {
+          // Find the correct ChatUsers object
+          ChatUsers? firstWhereOrNull(List<ChatUsers> list, bool Function(ChatUsers) test) {
+            for (ChatUsers element in list) {
+              if (test(element)) {
+                return element;
+              }
+            }
+            return null;
+          }
+
+// Usage
+          final ChatUsers? chatUser = firstWhereOrNull(chatUsers, (c) => c.chatId == currentChatId);
+
+          if (chatUser != null) {
+            // Update the secondaryText
+            setState(() {
+              chatUser.secondaryText = messageData['content'];
+            });
+          }
+        }
+
+          },
+      onError: (error) {
+        print("WebSocket Error: $error");
+        // Handle the error or attempt to reconnect
+      },
+    );
+    fetchChats();
+  }
+
+
+
+  String timeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inSeconds < 60) return 'Now';
+    if (difference.inMinutes < 60) return '${difference.inMinutes} min ago';
+    if (difference.inHours < 24) return '${difference.inHours} hr ago';
+    if (difference.inDays < 30) return '${difference.inDays} days ago';
+
+    return DateFormat('yMMMd').format(dateTime);
+  }
+  fetchChats() async {
+    try {
+      Map<String, dynamic> currentUser = await authService.getCurrentUser();
+
+      int participantId = currentUser['id']; // Use the ID from the current user
+
+      List<Chat> chats = await messagingService.getAllChats(participantId);
+
+      for (Chat chat in chats) {
+        int otherParticipantId = (chat.participantId1 == participantId) ? chat.participantId2 : chat.participantId1;
+        Map<String, dynamic> user = await authService.getUserById(otherParticipantId);
+        String imageUrl = await authService.getUrlFile(user['profile_picture']);
+
+        // Get the last message for this chat
+        print("****");
+        print(chat.id);
+        Map<String, dynamic>? lastMessage = await messagingService.getLastMessage(chat.id);
+        String secondaryText = lastMessage != null ? lastMessage['content'] : 'No messages yet';
+        bool isRead = lastMessage != null ? lastMessage['read'] : false;
+        DateTime? lastMessageTime;
+        if (lastMessage != null) {
+          lastMessageTime = DateTime.fromMillisecondsSinceEpoch(lastMessage['timestamp']);
+        }
+
+        String readableTime = lastMessageTime != null ? timeAgo(lastMessageTime) : 'Unknown';
+
+        chatUsers.add(
+          ChatUsers(
+            text: "${user['firstname']} ${user['lastname']}",
+            secondaryText: secondaryText,
+            image: imageUrl,
+            time: readableTime,
+            read: isRead,
+            chatId: chat.id,  // Add this
+            otherParticipantId: otherParticipantId,
+          ),
+        );
+      }
+
+      setState(() {}); // Rebuild the widget
+    } catch (e) {
+      print("Error fetching chats: $e");
+      // Handle the error appropriately
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +195,9 @@ class _ChatPageState extends State<ChatPage> {
                   secondaryText: chatUsers[index].secondaryText,
                   image: chatUsers[index].image,
                   time: chatUsers[index].time,
-                  isMessageRead: (index == 0 || index == 3)?true:false,
+                  isMessageRead: !chatUsers[index].read,
+                  chatId: chatUsers[index].chatId,  // Add this
+                  otherParticipantId: chatUsers[index].otherParticipantId,
                 );
               },
             ),
@@ -98,5 +206,11 @@ class _ChatPageState extends State<ChatPage> {
       ),
       bottomNavigationBar: CustomBottomNavigationBar(),
     );
+  }
+  @override
+  void dispose() {
+    channel!.sink.close();
+    _webSocketSubscription?.cancel();
+    super.dispose();
   }
 }

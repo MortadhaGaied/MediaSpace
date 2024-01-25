@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/searchSpace-service/pom.xml" />
         <option value="$PROJECT_DIR$/space-service/pom.xml" />
         <option value="$PROJECT_DIR$/messaging-service/pom.xml" />
+        <option value="$PROJECT_DIR$/mediaInteraction-service/pom.xml" />
       </list>
     </option>
   </component>

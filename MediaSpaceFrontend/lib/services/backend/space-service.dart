@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SpaceService {
-  final String baseApiUrl = "http://192.168.1.15:8082/space";
+  final String baseApiUrl = "http://192.168.192.1:8082/space";
 
   Future<http.Response> addSpace(Map<String, dynamic> space) async {
     final response = await http.post(

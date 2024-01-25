@@ -9,8 +9,17 @@ class ChatUsersList extends StatefulWidget{
   String image;
   String time;
   bool isMessageRead;
-  ChatUsersList({required this.fullname,required this.secondaryText,required this.image,required this.time,required this.isMessageRead});
-  @override
+  int chatId;
+  int otherParticipantId;
+  ChatUsersList({
+    required this.fullname,
+    required this.secondaryText,
+    required this.image,
+    required this.time,
+    required this.isMessageRead,
+    required this.chatId,  // Add this
+    required this.otherParticipantId,  // Add this
+  });  @override
   _ChatUsersListState createState() => _ChatUsersListState();
 }
 
@@ -20,7 +29,10 @@ class _ChatUsersListState extends State<ChatUsersList> {
     return GestureDetector(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(builder: (context){
-          return ChatDetailPage();
+          return ChatDetailPage(
+            chatId: widget.chatId,  // Pass the chatId
+            otherParticipantId: widget.otherParticipantId,  // Pass the otherParticipantId
+          );
         }));
       },
       child: Container(
@@ -31,7 +43,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
               child: Row(
                 children: <Widget>[
                   CircleAvatar(
-                    backgroundImage: AssetImage(widget.image),
+                    backgroundImage: NetworkImage(widget.image),
                     maxRadius: 30,
                   ),
                   SizedBox(width: 16,),

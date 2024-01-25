@@ -1,6 +1,6 @@
-import 'package:demo/widgets/customp_appbar.dart';
+import 'package:MediaSpaceFrontend/widgets/customp_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:demo/pages/search-pages/search_page.dart';
+import 'package:MediaSpaceFrontend/pages/search-pages/search_page.dart';
 
 import '../widgets/custom_bottomNavigationBar.dart';
 class MyHomePage extends StatefulWidget {

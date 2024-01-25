@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class AuthenticationService {
-  final String baseUrl = 'http://192.168.1.15:8081/auth';
+  final String baseUrl = 'http://192.168.192.1:8081/auth';
   final storage = new FlutterSecureStorage();
   Future<http.Response> register(Map<String, dynamic> requestData) async {
     final response = await http.post(

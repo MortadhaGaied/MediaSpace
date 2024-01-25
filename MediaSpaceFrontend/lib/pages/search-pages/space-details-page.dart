@@ -7,7 +7,7 @@ import '../../services/backend/auth-service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'dart:math' as math;
 import '../../widgets/image-slider.dart';
 import '../../widgets/map.dart';
 import '../reservation/make_reservation.dart';
@@ -47,16 +47,23 @@ class _SpaceDetailsPageState extends State<SpaceDetailsPage> {
       http.Response response = await spaceService.retrieveSpace(widget.spaceId);
 
       if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        var eventPrices = responseData['eventPrices'] as List<dynamic>;
+        double minPrice = eventPrices.fold<double>(
+          double.infinity,
+              (previousValue, element) => math.min(previousValue, element['price']),
+        );
+
         setState(() {
-          space = json.decode(response.body);
+          space = responseData;
+          space['minPrice'] = minPrice; // Add the minimum price to the space map
+          isLoading = false;
         });
 
         try {
           Map<String, dynamic> ownerResponse = await authenticationService.getUserById(space['ownerId']);
           setState(() {
             owner = ownerResponse;
-            print("*5658***********655645-**********6551*/54848");
-            print(owner);
             isLoading = false;
           });
         } catch (e) {
@@ -71,6 +78,7 @@ class _SpaceDetailsPageState extends State<SpaceDetailsPage> {
     }
   }
   Widget buildExpandablePanel(String header, Widget expandedContent, {bool isLast = false}) {
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -130,17 +138,19 @@ class _SpaceDetailsPageState extends State<SpaceDetailsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text("\$${space['price']}/hr"
-                ,style: TextStyle(fontSize: 35),),
+                Text(
+                  "\$${space['minPrice']}/hr",
+                  style: TextStyle(fontSize: 35),
+                ),
                 Text(
                   "${space['maxGuest']} guests",
                   style: TextStyle(
                     // Add your text style
                   ),
                 ),
-
               ],
             ),
+
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -148,7 +158,10 @@ class _SpaceDetailsPageState extends State<SpaceDetailsPage> {
                 ElevatedButton(
                   onPressed: () {Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ReservationRequestWidget()),
+                    MaterialPageRoute(builder: (context) => ReservationRequestWidget(
+                      spaceId: space['id'],
+                      ownerId: space['ownerId'],
+                    )),
                   );},
                   child: Text(
                     'Reservez',

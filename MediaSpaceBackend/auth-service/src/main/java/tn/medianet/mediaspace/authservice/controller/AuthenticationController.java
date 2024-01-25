@@ -1,7 +1,9 @@
 package tn.medianet.mediaspace.authservice.controller;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tn.medianet.mediaspace.authservice.service.*;
 
 import javax.validation.Valid;
@@ -43,6 +45,8 @@ public class AuthenticationController {
     public String getUrlFile(@PathVariable String filename) throws IOException {
         return serviceFile.getDownloadUrl(filename);
     }
+
+
 
 
 

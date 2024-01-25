@@ -18,7 +18,7 @@ public class SpaceMapper {
         space.setName(spaceDto.getName());
         space.setAddress(spaceDto.getAddress());
         space.setDescription(spaceDto.getDescription());
-        space.setPrice(spaceDto.getPrice());
+        space.setEventPrices(spaceDto.getEventPrices());
         space.setMaxGuest(spaceDto.getMaxGuest());
         space.setRoomNumber(spaceDto.getRoomNumber());
         space.setBathroomNumber(spaceDto.getBathroomNumber());
@@ -50,7 +50,7 @@ public class SpaceMapper {
         spaceDto.setName(space.getName());
         spaceDto.setAddress(space.getAddress());
         spaceDto.setDescription(space.getDescription());
-        spaceDto.setPrice(space.getPrice());
+        spaceDto.setEventPrices(space.getEventPrices());
         spaceDto.setMaxGuest(space.getMaxGuest());
         spaceDto.setRoomNumber(space.getRoomNumber());
         spaceDto.setBathroomNumber(space.getBathroomNumber());

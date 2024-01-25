@@ -60,22 +60,32 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: -160,
-            left: -30,
-            child: topWidget(screenSize.width),
+      body: SingleChildScrollView( // Add SingleChildScrollView here
+        child: ConstrainedBox( // Add ConstrainedBox to size the scrollable area
+          constraints: BoxConstraints(
+            minHeight: screenSize.height, // Minimum height to take full screen height
           ),
-          Positioned(
-            bottom: -180,
-            left: -40,
-            child: bottomWidget(screenSize.width),
+          child: IntrinsicHeight( // Add IntrinsicHeight to size the content properly
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -160,
+                  left: -30,
+                  child: topWidget(screenSize.width),
+                ),
+                Positioned(
+                  bottom: -180,
+                  left: -40,
+                  child: bottomWidget(screenSize.width),
+                ),
+                CenterWidget(size: screenSize),
+                LoginContent(destination: widget.destination),
+              ],
+            ),
           ),
-          CenterWidget(size: screenSize),
-          LoginContent(destination: widget.destination),
-        ],
+        ),
       ),
     );
   }
+
 }

@@ -23,7 +23,7 @@ class _PageTwoStep3State extends State<PageTwoStep3> {
     'Sunday   ': false,
   };
 
-  Map<String, TimeOfDay?> selectedTimes = {
+  Map<String, SpaceAvailability?> selectedTimes = {
     'Monday': null,
     'Tuesday': null,
     'Wednesday': null,
@@ -33,18 +33,16 @@ class _PageTwoStep3State extends State<PageTwoStep3> {
     'Sunday': null,
   };
   List<SpaceAvailability> spaceAvailabilityList = [];
-  void updateSpaceAvailability(String day) {
+
+
+  void addOrUpdateAvailability(String day) {
+    spaceAvailabilityList.removeWhere((av) => av.dayOfWeek == day);
+
     if (daysOpen[day]! && selectedTimes[day] != null) {
-      final availability = SpaceAvailability(
-        dayOfWeek: day,
-        startTime: selectedTimes[day]!,
-        endTime: selectedTimes[day]!, // You can update this with the actual end time
-      );
-      spaceAvailabilityList.add(availability);
-    } else {
-      spaceAvailabilityList.removeWhere((element) => element.dayOfWeek == day);
+      spaceAvailabilityList.add(selectedTimes[day]!);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -66,80 +64,87 @@ class _PageTwoStep3State extends State<PageTwoStep3> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(day),
-                      SizedBox(width: 10),
-                      Switch(
-                        value: daysOpen[day]!,
-                        onChanged: (value) {
-                          setState(() {
-                            daysOpen[day] = value;
-                            updateSpaceAvailability(day);  // Add this line
-                          });
-                        },
-                        activeColor: Colors.black,
-                      ),
-                      Text(daysOpen[day]! ? "Ouvert" : "Fermer"),
-                    ],
-                  ),
-                  if (daysOpen[day]!)
-                    Row(
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("From"),
-                        TimePickerSpinner(
-                          is24HourMode: false,
-                          normalTextStyle: TextStyle(fontSize: 15, color: Colors.grey),
-                          highlightedTextStyle: TextStyle(fontSize: 15, color: Colors.black),
-                          spacing: 5,
-                          itemHeight: 20,
-                          isForce2Digits: true,
-                          onTimeChange: (time) {
-                            setState(() {
-                              selectedTimes[day] = TimeOfDay.fromDateTime(time);
-                              updateSpaceAvailability(day);  // Add this line
-                            });
-                          },
-                        ),
-                        Text("To"),
-                        TimePickerSpinner(
-                          is24HourMode: false,
-                          normalTextStyle: TextStyle(fontSize: 15, color: Colors.grey),
-                          highlightedTextStyle: TextStyle(fontSize: 15, color: Colors.black),
-                          spacing: 5,
-                          itemHeight: 20,
-                          isForce2Digits: true,
-                          onTimeChange: (time) {
-                            setState(() {
-                              selectedTimes[day] = TimeOfDay.fromDateTime(time);
-                              updateSpaceAvailability(day);  // Add this line
-                            });
-                          },
+                        Text(day),
+                        Row(
+                          children: [
+                            Text(daysOpen[day]! ? "Ouvert" : "Fermer"),
+                            Switch(
+                              value: daysOpen[day]!,
+                              onChanged: (value) {
+                                setState(() {
+                                  daysOpen[day] = value;
+                                  //addOrUpdateAvailability(day);
+                                });
+                              },
+                              activeColor: Colors.black,
+                            ),
+                          ],
                         ),
                       ],
+                    ),
+                  ),
+                  if (daysOpen[day]!)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text("De: "),
+                          TimePickerSpinner(
+                            onTimeChange: (time) {
+                              setState(() {
+                                if (selectedTimes[day] == null) {
+                                  selectedTimes[day] = SpaceAvailability(
+                                    dayOfWeek: day,
+                                    startTime: TimeOfDay.fromDateTime(time),
+                                    endTime: TimeOfDay(hour: 0, minute: 0),
+                                  );
+                                } else {
+                                  selectedTimes[day]!.startTime = TimeOfDay.fromDateTime(time);
+                                }
+                                addOrUpdateAvailability(day);
+                              });
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          Text("À: "),
+                          TimePickerSpinner(
+                            onTimeChange: (time) {
+                              setState(() {
+                                if (selectedTimes[day] == null) {
+                                  selectedTimes[day] = SpaceAvailability(
+                                    dayOfWeek: day,
+                                    startTime: TimeOfDay(hour: 0, minute: 0),
+                                    endTime: TimeOfDay.fromDateTime(time),
+                                  );
+                                } else {
+                                  selectedTimes[day]!.endTime = TimeOfDay.fromDateTime(time);
+                                }
+                                addOrUpdateAvailability(day);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                 ],
               );
             }).toList(),
             ElevatedButton(
               onPressed: () {
-                for (SpaceAvailability availability in spaceAvailabilityList) {
-                  print('Day of Week: ${availability.dayOfWeek}');
-                  print('Start Time: ${availability.startTime.hour}:${availability.startTime.minute}');
-                  print('End Time: ${availability.endTime.hour}:${availability.endTime.minute}');
-                  print('---');
-                }
+                print(spaceAvailabilityList);
               },
               child: Text("Print List"),
-            )
-
+            ),
           ],
-
         ),
-      )
+      ),
     );
-
   }
 }
 

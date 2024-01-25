@@ -1,0 +1,5 @@
+
+q	java:S116#"WRename this field "phone_number" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ñùñúÿÿÿÿ
+n	java:S116$"ZRename this field "profile_picture" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(àõ£s
+h
+java:S62045"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹

@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -31,8 +32,7 @@ public class Space {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private double price;
+
     private int maxGuest;
     private int roomNumber;
     private int bathroomNumber;
@@ -52,11 +52,14 @@ public class Space {
     private List<String> images;
     @Column(nullable = false)
     private double squareFootage;
+
     @ElementCollection
     private List<SpaceAvailability> availabilities;
 
     @Column(name = "user_id", nullable = false)
     private Long ownerId;
+    @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SpaceEventPrice> eventPrices;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

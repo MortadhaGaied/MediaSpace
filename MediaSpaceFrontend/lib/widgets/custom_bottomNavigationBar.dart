@@ -1,26 +1,28 @@
-import 'package:demo/pages/auth_pages/login_signup/login_screen.dart';
-import 'package:demo/pages/home_page.dart';
-import 'package:demo/pages/messaging_pages/chat_page.dart';
-import 'package:demo/pages/profile_pages/profile_screen.dart';
-import 'package:demo/services/backend/auth-service.dart';
+import 'package:MediaSpaceFrontend/pages/auth_pages/login_signup/login_screen.dart';
+import 'package:MediaSpaceFrontend/pages/home_page.dart';
+import 'package:MediaSpaceFrontend/pages/media_interaction/VideoScreen.dart';
+import 'package:MediaSpaceFrontend/pages/messaging_pages/chat_page.dart';
+import 'package:MediaSpaceFrontend/pages/profile_pages/profile_screen.dart';
+import 'package:MediaSpaceFrontend/services/backend/auth-service.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  final AuthenticationService _authenticationService=AuthenticationService();
+  final AuthenticationService _authenticationService = AuthenticationService();
   Future<void> navigate(BuildContext context, Widget destination) async {
     bool loggedIn = await _authenticationService.isLoggedIn();
     if (loggedIn) {
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => destination),
       );
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen(destination: destination,)),
+        MaterialPageRoute(builder: (context) => LoginScreen(destination: destination)),
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
@@ -35,10 +37,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MyHomePage()),
-                    );
+                    navigate(context, MyHomePage());
                   },
                   icon: Icon(Icons.search),
                   color: Colors.white,
@@ -63,7 +62,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => VideoScreen()),
+                    );
+                  },
                   icon: Icon(Icons.video_library),
                   color: Colors.white,
                 ),
