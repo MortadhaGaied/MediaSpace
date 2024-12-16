@@ -5,7 +5,7 @@ import '../models/chat.dart';
 import '../models/message.dart';
 
 class MessagingService {
-  final String baseUrl = 'http://192.168.192.1:8083';
+  final String baseUrl = 'http://172.29.64.1:8083';
 
   Future<Message> sendMessage(Message message) async {
     final response = await http.post(

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 class MediaInteractionService {
-  final String baseUrl = "http://192.168.192.1:8085/mediainteraction";
+  final String baseUrl = "http://172.29.64.1:8085/mediainteraction";
 
   Future<void> addVideo(int spaceId, File videoFile) async {
     final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/video/$spaceId'));

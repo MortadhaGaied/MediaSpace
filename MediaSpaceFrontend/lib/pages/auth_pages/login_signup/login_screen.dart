@@ -60,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView( // Add SingleChildScrollView here
         child: ConstrainedBox( // Add ConstrainedBox to size the scrollable area
           constraints: BoxConstraints(

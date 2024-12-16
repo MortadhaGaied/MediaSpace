@@ -272,7 +272,7 @@ class _LoginContentState extends State<LoginContent>
             icon: Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               ChangeScreenAnimation.dispose();
-              Navigator.of(context).pop();
+              Navigator.pop(context);
             },
           ),
         ),
